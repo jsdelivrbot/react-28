@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from "react";
 import ReactDom from "react-dom";
 import SearchBar from "./components/search_bar";
@@ -12,14 +13,17 @@ const API_KEY = "AIzaSyDMJxyx4nLq76bqzviywDAtNHBcIjk_wO8";
 class App extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       videos: [],
       selectedVideo: null
     };
+
+    this.videoSearch("AI");
   }
 
-  videoSearch(term){
-    YTSearch({ key: API_KEY, term: "AI" }, videos => {
+  videoSearch(term) {
+    YTSearch({ key: API_KEY, term: term }, videos => {
       // this.setState({videos: videos}); refactor to es6
       this.setState({
         videos: videos,
@@ -29,13 +33,15 @@ class App extends Component {
   }
 
   render() {
+    const videoSearch = _.debounce((term)=> {this.videoSearch(term)}, 300);
     return (
       <div>
-        <SearchBar />
+        <SearchBar onSearchTermChange={videoSearch} />
         <VideoDetail video={this.state.selectedVideo} />
         <VideoList
-          onVideoSelect={selectedVideo => this.setState({selectedVideo})}
-          videos={this.state.videos} />
+          onVideoSelect={selectedVideo => this.setState({ selectedVideo })}
+          videos={this.state.videos}
+        />
       </div>
     );
   }
